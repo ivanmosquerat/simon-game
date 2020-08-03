@@ -3,6 +3,7 @@ const violeta = document.getElementById('violeta')
 const naranja = document.getElementById('naranja')
 const verde = document.getElementById('verde')
 const btnEmpezar = document.getElementById('btnEmpezar')
+const puntajeText = document.getElementById('puntaje')
 const ULTIMO_NIVEL = 10
 
 class Juego {
@@ -19,13 +20,25 @@ class Juego {
 
     //Funcion para inicializar el juego. Esconde el boton.
     inicializar() {
-        btnEmpezar.classList.add('hide')
+        this.siguienteNivel = this.siguienteNivel.bind(this)
+        this.elegirColor = this.elegirColor.bind(this)
+        this.toggleBtnEmpezar()
+        
+        this.puntaje = 0
         this.nivel = 1
         this.colores = {
             celeste,
             violeta,
             naranja,
             verde
+        }
+    }
+
+    toggleBtnEmpezar(){
+        if(btnEmpezar.classList.contains('hide')){
+            btnEmpezar.classList.remove('hide')
+        }else{
+            btnEmpezar.classList.add('hide')
         }
     }
 
@@ -37,6 +50,7 @@ class Juego {
         this.subnivel = 0
         this.iluminarSecuencia()
         this.agregarEventosClick()
+        
     }
 
     transformarNumeroColor(numero){
@@ -60,7 +74,7 @@ class Juego {
 
     iluminarColor(color){
         this.colores[color].classList.add('light')
-        setTimeout(() => this.apagarColor(color), 1000)
+        setTimeout(() => this.apagarColor(color), 350)
     }
 
     apagarColor(color){
@@ -68,17 +82,17 @@ class Juego {
     }
 
     agregarEventosClick(){
-        this.colores.celeste.addEventListener('click', this.elegirColor.bind(this))
-        this.colores.verde.addEventListener('click', this.elegirColor.bind(this))
-        this.colores.violeta.addEventListener('click', this.elegirColor.bind(this))
-        this.colores.naranja.addEventListener('click', this.elegirColor.bind(this))
+        this.colores.celeste.addEventListener('click', this.elegirColor)
+        this.colores.verde.addEventListener('click', this.elegirColor)
+        this.colores.violeta.addEventListener('click', this.elegirColor)
+        this.colores.naranja.addEventListener('click', this.elegirColor)
     }
 
     eliminarEventosClick(){
-        this.colores.celeste.removeEventListener('click', this.elegirColor.bind(this))
-        this.colores.verde.removeEventListener('click', this.elegirColor.bind(this))
-        this.colores.violeta.removeEventListener('click', this.elegirColor.bind(this))
-        this.colores.naranja.removeEventListener('click', this.elegirColor.bind(this))
+        this.colores.celeste.removeEventListener('click', this.elegirColor)
+        this.colores.verde.removeEventListener('click', this.elegirColor)
+        this.colores.violeta.removeEventListener('click', this.elegirColor)
+        this.colores.naranja.removeEventListener('click', this.elegirColor)
     }
 
     elegirColor(ev){
@@ -91,19 +105,23 @@ class Juego {
             this.subnivel++
             
             if(this.subnivel === this.nivel){
+
                 this.nivel++
                 this.eliminarEventosClick()
+
+                this.puntaje += 10
+                document.getElementById('puntaje').innerHTML = this.puntaje + " puntos"
                 
                 if(this.nivel === (ULTIMO_NIVEL + 1)){
-                    //GANADOR!
+                    this.ganaElJuego()
                 }else{
-                    setTimeout(this.siguienteNivel.bind(this), 3000)
+                    setTimeout(this.siguienteNivel.bind(this), 1500)
                 }
 
             }
         }else{
-            console.log("PERDISTE")
-            //PERDEDOR
+            
+            this.pierdeElJuego()
         }
     }
 
@@ -117,6 +135,20 @@ class Juego {
                 return 2
             case 'verde':
         }       return 3
+    }
+
+    ganaElJuego(){
+        swal('Juego', 'Felicitaciones, ganaste', 'success').then(() => {
+            this.eliminarEventosClick()
+            this.inicializar()
+        })
+    }
+
+    pierdeElJuego(){
+        swal('Juego', 'Lo lamento, perdiste', 'error').then(() => {
+            this.eliminarEventosClick()
+            this.inicializar()
+        })
     }
 
     
